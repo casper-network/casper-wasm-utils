@@ -8,9 +8,11 @@ pub mod rules;
 
 mod ext;
 mod gas;
+mod graph;
 #[cfg(feature = "cli")]
 pub mod logger;
 mod optimizer;
+mod ref_list;
 mod symbols;
 
 pub mod stack_height;
@@ -19,6 +21,7 @@ pub use ext::{
     externalize, externalize_mem, shrink_unknown_stack, underscore_funcs, ununderscore_funcs,
 };
 pub use gas::inject_gas_counter;
+pub use graph::{generate as graph_generate, parse as graph_parse, Module};
 pub use optimizer::{optimize, Error as OptimizerError};
 pub use parity_wasm;
 
