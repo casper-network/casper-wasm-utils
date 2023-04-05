@@ -12,38 +12,13 @@ repository = "https://github.com/paritytech/wasm-utils"
 include = ["src/**/*", "LICENSE-*", "README.md", "cli/**/*"]
 
 [[bin]]
-name = "wasm-prune"
-path = "cli/prune/main.rs"
-required-features = ["cli"]
-
-[[bin]]
-name = "wasm-ext"
-path = "cli/ext/main.rs"
-required-features = ["cli"]
-
-[[bin]]
 name = "wasm-gas"
-path = "cli/gas/main.rs"
-required-features = ["cli"]
-
-[[bin]]
-name = "wasm-build"
-path = "cli/build/main.rs"
+path = "cli/gas.rs"
 required-features = ["cli"]
 
 [[bin]]
 name = "wasm-stack-height"
-path = "cli/stack_height/main.rs"
-required-features = ["cli"]
-
-[[bin]]
-name = "wasm-pack"
-path = "cli/pack/main.rs"
-required-features = ["cli"]
-
-[[bin]]
-name = "wasm-check"
-path = "cli/check/main.rs"
+path = "cli/stack_height.rs"
 required-features = ["cli"]
 
 [dependencies]
