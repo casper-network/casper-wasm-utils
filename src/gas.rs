@@ -588,7 +588,7 @@ mod tests {
         );
 
         let binary = serialize(injected_module).expect("serialization failed");
-        wabt::wasm2wat(&binary).unwrap();
+        wabt::wasm2wat(binary).unwrap();
     }
 
     #[test]
@@ -623,7 +623,7 @@ mod tests {
         assert_eq!(injected_module.functions_space(), 2);
 
         let binary = serialize(injected_module).expect("serialization failed");
-        wabt::wasm2wat(&binary).unwrap();
+        wabt::wasm2wat(binary).unwrap();
     }
 
     #[test]

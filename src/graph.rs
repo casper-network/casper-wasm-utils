@@ -781,7 +781,7 @@ mod tests {
 
     fn validate_sample(module: &super::Module) {
         let binary = super::generate(module).expect("Failed to generate binary");
-        wabt::Module::read_binary(&binary, &Default::default())
+        wabt::Module::read_binary(binary, &Default::default())
             .expect("Wabt failed to read final binary")
             .validate()
             .expect("Invalid module");

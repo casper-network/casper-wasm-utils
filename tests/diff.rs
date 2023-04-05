@@ -20,7 +20,7 @@ fn dump<P: AsRef<Path>>(path: P, buf: &[u8]) -> io::Result<()> {
 }
 
 fn validate_wasm(binary: &[u8]) -> Result<(), wabt::Error> {
-    wabt::Module::read_binary(&binary, &Default::default())?.validate()?;
+    wabt::Module::read_binary(binary, &Default::default())?.validate()?;
     Ok(())
 }
 

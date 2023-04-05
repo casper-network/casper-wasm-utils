@@ -378,7 +378,7 @@ mod tests {
 
     fn validate_module(module: elements::Module) {
         let binary = elements::serialize(module).expect("Failed to serialize");
-        wabt::Module::read_binary(&binary, &Default::default())
+        wabt::Module::read_binary(binary, &Default::default())
             .expect("Wabt failed to read final binary")
             .validate()
             .expect("Invalid module");
