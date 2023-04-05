@@ -448,7 +448,7 @@ pub fn update_call_index(instructions: &mut elements::Instructions, eliminated_i
 
 /// Updates global references considering the _ordered_ list of eliminated indices
 pub fn update_global_index(
-    instructions: &mut Vec<elements::Instruction>,
+    instructions: &mut [elements::Instruction],
     eliminated_indices: &[usize],
 ) {
     use parity_wasm::elements::Instruction::*;

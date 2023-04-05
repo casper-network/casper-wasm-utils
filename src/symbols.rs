@@ -22,7 +22,7 @@ pub fn resolve_function(module: &elements::Module, index: u32) -> Symbol {
         for (item_index, item) in import_section.entries().iter().enumerate() {
             if let elements::External::Function(_) = item.external() {
                 if functions == index {
-                    return Symbol::Import(item_index as usize);
+                    return Symbol::Import(item_index);
                 }
                 functions += 1;
             }
@@ -38,7 +38,7 @@ pub fn resolve_global(module: &elements::Module, index: u32) -> Symbol {
         for (item_index, item) in import_section.entries().iter().enumerate() {
             if let elements::External::Global(_) = item.external() {
                 if globals == index {
-                    return Symbol::Import(item_index as usize);
+                    return Symbol::Import(item_index);
                 }
                 globals += 1;
             }
