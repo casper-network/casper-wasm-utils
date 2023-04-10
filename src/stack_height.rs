@@ -49,11 +49,10 @@
 //!   between the frames.
 //! - upon entry into the function entire stack frame is allocated.
 
-use crate::std::{mem, string::String, vec::Vec};
-
+use crate::std::{string::String, vec::Vec};
 use parity_wasm::{
     builder,
-    elements::{self, Instruction, Instructions, Type},
+    elements::{self, Instruction, Type},
 };
 
 /// Macro to generate preamble and postamble.
@@ -200,19 +199,11 @@ fn compute_stack_cost(func_idx: u32, module: &elements::Module) -> Result<u32, E
         .bodies()
         .get(defined_func_idx as usize)
         .ok_or_else(|| Error("Function body is out of bounds".into()))?;
-
-    let mut locals_count: u32 = 0;
-    for local_group in body.locals() {
-        locals_count = locals_count
-            .checked_add(local_group.count())
-            .ok_or_else(|| Error("Overflow in local count".into()))?;
-    }
+    let locals_count = body.locals().len() as u32;
 
     let max_stack_height = max_height::compute(defined_func_idx, module)?;
 
-    locals_count
-        .checked_add(max_stack_height)
-        .ok_or_else(|| Error("Overflow in adding locals_count and max_stack_height".into()))
+    Ok(locals_count + max_stack_height)
 }
 
 fn instrument_functions(ctx: &mut Context, module: &mut elements::Module) -> Result<(), Error> {
@@ -253,72 +244,85 @@ fn instrument_functions(ctx: &mut Context, module: &mut elements::Module) -> Res
 ///
 /// drop
 /// ```
-fn instrument_function(ctx: &mut Context, func: &mut Instructions) -> Result<(), Error> {
-    use Instruction::*;
+fn instrument_function(
+    ctx: &mut Context,
+    instructions: &mut elements::Instructions,
+) -> Result<(), Error> {
+    use parity_wasm::elements::Instruction::*;
 
-    struct InstrumentCall {
-        offset: usize,
-        callee: u32,
-        cost: u32,
-    }
+    let mut cursor = 0;
+    loop {
+        if cursor >= instructions.elements().len() {
+            break;
+        }
 
-    let calls: Vec<_> = func
-        .elements()
-        .iter()
-        .enumerate()
-        .filter_map(|(offset, instruction)| {
-            if let Call(callee) = instruction {
-                ctx.stack_cost(*callee).and_then(|cost| {
-                    if cost > 0 {
-                        Some(InstrumentCall {
-                            callee: *callee,
-                            offset,
-                            cost,
-                        })
+        enum Action {
+            InstrumentCall {
+                callee_idx: u32,
+                callee_stack_cost: u32,
+            },
+            Nop,
+        }
+
+        let action: Action = {
+            let instruction = &instructions.elements()[cursor];
+            match instruction {
+                Call(callee_idx) => {
+                    let callee_stack_cost = ctx.stack_cost(*callee_idx).ok_or_else(|| {
+                        Error(format!(
+                            "Call to function that out-of-bounds: {}",
+                            callee_idx
+                        ))
+                    })?;
+
+                    // Instrument only calls to a functions which stack_cost is
+                    // non-zero.
+                    if callee_stack_cost > 0 {
+                        Action::InstrumentCall {
+                            callee_idx: *callee_idx,
+                            callee_stack_cost,
+                        }
                     } else {
-                        None
+                        Action::Nop
                     }
-                })
-            } else {
-                None
+                }
+                _ => Action::Nop,
             }
-        })
-        .collect();
+        };
 
-    // The `instrumented_call!` contains the call itself. This is why we need to subtract one.
-    let len = func.elements().len() + calls.len() * (instrument_call!(0, 0, 0, 0).len() - 1);
-    let original_instrs = mem::replace(func.elements_mut(), Vec::with_capacity(len));
-    let new_instrs = func.elements_mut();
-
-    let mut calls = calls.into_iter().peekable();
-    for (original_pos, instr) in original_instrs.into_iter().enumerate() {
-        // whether there is some call instruction at this position that needs to be instrumented
-        let did_instrument = if let Some(call) = calls.peek() {
-            if call.offset == original_pos {
+        match action {
+            // We need to wrap a `call idx` instruction
+            // with a code that adjusts stack height counter
+            // and then restores it.
+            Action::InstrumentCall {
+                callee_idx,
+                callee_stack_cost,
+            } => {
                 let new_seq = instrument_call!(
-                    call.callee,
-                    call.cost as i32,
+                    callee_idx,
+                    callee_stack_cost as i32,
                     ctx.stack_height_global_idx(),
                     ctx.stack_limit()
                 );
-                new_instrs.extend(new_seq);
-                true
-            } else {
-                false
+
+                // Replace the original `call idx` instruction with
+                // a wrapped call sequence.
+                //
+                // To splice actually take a place, we need to consume iterator
+                // splice returns. So we just `count()` it.
+                let _ = instructions
+                    .elements_mut()
+                    .splice(cursor..(cursor + 1), new_seq.iter().cloned())
+                    .count();
+
+                // Advance cursor to be after the inserted sequence.
+                cursor += new_seq.len();
             }
-        } else {
-            false
-        };
-
-        if did_instrument {
-            calls.next();
-        } else {
-            new_instrs.push(instr);
+            // Do nothing for other instructions.
+            _ => {
+                cursor += 1;
+            }
         }
-    }
-
-    if calls.next().is_some() {
-        return Err(Error("Not all calls were used".into()));
     }
 
     Ok(())

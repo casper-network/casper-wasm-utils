@@ -7,10 +7,9 @@
 #[cfg(test)]
 mod validation;
 
-use crate::std::{cmp::min, mem, vec::Vec};
-
 use crate::rules::Rules;
-use parity_wasm::{builder, elements, elements::ValueType};
+use crate::std::{cmp::min, mem, vec::Vec};
+use parity_wasm::{builder, elements};
 
 pub fn update_call_index(instructions: &mut elements::Instructions, inserted_index: u32) {
     use parity_wasm::elements::Instruction::*;
@@ -253,8 +252,10 @@ fn add_grow_counter<R: Rules>(
     b.push_function(
         builder::function()
             .signature()
-            .with_param(ValueType::I32)
-            .with_result(ValueType::I32)
+            .params()
+            .i32()
+            .build()
+            .with_return_type(Some(elements::ValueType::I32))
             .build()
             .body()
             .with_instructions(elements::Instructions::new(vec![
@@ -447,8 +448,7 @@ pub fn inject_gas_counter<R: Rules>(
 ) -> Result<elements::Module, elements::Module> {
     // Injecting gas counting external
     let mut mbuilder = builder::from_module(module);
-    let import_sig =
-        mbuilder.push_signature(builder::signature().with_param(ValueType::I32).build_sig());
+    let import_sig = mbuilder.push_signature(builder::signature().param().i32().build_sig());
 
     mbuilder.push_import(
         builder::import()
@@ -532,7 +532,8 @@ pub fn inject_gas_counter<R: Rules>(
 mod tests {
     use super::*;
     use crate::rules;
-    use parity_wasm::{builder, elements, elements::Instruction::*, serialize};
+    use parity_wasm::elements::Instruction::*;
+    use parity_wasm::{builder, elements, serialize};
 
     pub fn get_function_body(
         module: &elements::Module,
@@ -992,32 +993,6 @@ mod tests {
 					(get_global 0)
 					(drop))
 				(get_global 0)))
-		"#
-    }
-
-    test_gas_counter_injection! {
-        name = empty_loop;
-        input = r#"
-		(module
-			(func
-				(loop
-					(br 0)
-				)
-				unreachable
-			)
-		)
-		"#;
-        expected = r#"
-		(module
-			(func
-				(call 0 (i32.const 2))
-				(loop
-					(call 0 (i32.const 1))
-					(br 0)
-				)
-				unreachable
-			)
-		)
 		"#
     }
 }

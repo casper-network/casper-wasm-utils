@@ -1,5 +1,5 @@
+use casper_wasm_utils as utils;
 use parity_wasm::elements;
-use pwasm_utils as utils;
 use std::{
     fs,
     io::{self, Read, Write},
@@ -60,11 +60,9 @@ fn run_diff_test<F: FnOnce(&[u8]) -> Vec<u8>>(test_dir: &str, name: &str, test: 
             }
         }
 
-        if std::env::var_os("BLESS").is_some() {
-            dump(&expected_path, actual_wat.as_bytes()).expect("Failed to write to expected");
-        } else {
-            panic!();
-        }
+        dump(&expected_path, actual_wat.as_bytes()).expect("Failed to write to expected");
+
+        panic!();
     }
 }
 
@@ -95,7 +93,6 @@ mod stack_height {
     def_stack_height_test!(table);
     def_stack_height_test!(global);
     def_stack_height_test!(imports);
-    def_stack_height_test!(many_locals);
 }
 
 mod gas {

@@ -4,12 +4,11 @@ use crate::std::collections::BTreeMap as Map;
 use crate::std::collections::HashMap as Map;
 use crate::std::vec::Vec;
 
+use super::{resolve_func_type, Context, Error};
 use parity_wasm::{
     builder,
     elements::{self, FunctionType, Internal},
 };
-
-use super::{resolve_func_type, Context, Error};
 
 struct Thunk {
     signature: FunctionType,
@@ -104,7 +103,7 @@ pub(crate) fn generate_thunks(
             // Signature of the thunk should match the original function signature.
             .signature()
             .with_params(thunk.signature.params().to_vec())
-            .with_results(thunk.signature.results().to_vec())
+            .with_return_type(thunk.signature.return_type())
             .build()
             .body()
             .with_instructions(elements::Instructions::new(thunk_body))
