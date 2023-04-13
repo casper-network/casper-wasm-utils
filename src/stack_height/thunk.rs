@@ -1,4 +1,4 @@
-use crate::std::collections::BTreeMap as Map;
+use crate::std::collections::{BTreeMap as Map, BTreeSet as Set};
 use crate::std::vec::Vec;
 
 use parity_wasm::{
@@ -44,10 +44,12 @@ pub(crate) fn generate_thunks(
         // Replacement map is at least export section size.
         let mut replacement_map: Map<u32, Thunk> = Map::new();
 
-        for func_idx in exported_func_indices
+        let set_of_func_idx: Set<_> = exported_func_indices
             .chain(table_func_indices)
-            .chain(start_func_idx.into_iter())
-        {
+            .chain(start_func_idx)
+            .collect();
+
+        for func_idx in set_of_func_idx {
             let callee_stack_cost = ctx
                 .stack_cost(func_idx)
                 .ok_or_else(|| Error(format!("function with idx {} isn't found", func_idx)))?;
