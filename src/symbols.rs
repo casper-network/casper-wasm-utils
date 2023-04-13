@@ -1,7 +1,4 @@
-#[cfg(not(features = "std"))]
 use crate::std::collections::BTreeSet as Set;
-#[cfg(features = "std")]
-use crate::std::collections::HashSet as Set;
 use crate::std::vec::Vec;
 
 use log::trace;

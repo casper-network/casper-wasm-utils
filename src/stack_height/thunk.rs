@@ -1,7 +1,4 @@
-#[cfg(not(features = "std"))]
 use crate::std::collections::BTreeMap as Map;
-#[cfg(features = "std")]
-use crate::std::collections::HashMap as Map;
 use crate::std::vec::Vec;
 
 use parity_wasm::{
