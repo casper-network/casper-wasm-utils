@@ -29,23 +29,25 @@ pub fn optimize(
     *module = module_temp;
 
     // Algo starts from the top, listing all items that should stay
-    let mut stay = Set::new();
-    for (index, entry) in module
+    let mut stay: Set<_> = module
         .export_section()
         .ok_or(Error::NoExportSection)?
         .entries()
         .iter()
         .enumerate()
-    {
-        if used_exports.iter().any(|e| *e == entry.field()) {
-            stay.insert(Symbol::Export(index));
-        }
-    }
+        .filter_map(|(index, entry)| {
+            if used_exports.iter().any(|e| *e == entry.field()) {
+                Some(Symbol::Export(index))
+            } else {
+                None
+            }
+        })
+        .collect();
 
-    // If there is start function in module, it should stary
-    module
-        .start_section()
-        .map(|ss| stay.insert(resolve_function(module, ss)));
+    // If there is start function in module, it should start
+    if let Some(ss) = module.start_section() {
+        stay.insert(resolve_function(module, ss));
+    }
 
     // All symbols used in data/element segments are also should be preserved
     let mut init_symbols = Vec::new();
@@ -78,9 +80,8 @@ pub fn optimize(
             }
         }
     }
-    for symbol in init_symbols.drain(..) {
-        stay.insert(symbol);
-    }
+
+    stay.extend(init_symbols.drain(..));
 
     // Call function which will traverse the list recursively, filling stay with all symbols
     // that are already used by those which already there
@@ -99,27 +100,25 @@ pub fn optimize(
     let mut index = 0;
     let mut old_index = 0;
 
-    {
-        loop {
-            if type_section(module)
-                .map(|section| section.types_mut().len())
-                .unwrap_or(0)
-                == index
-            {
-                break;
-            }
-
-            if stay.contains(&Symbol::Type(old_index)) {
-                index += 1;
-            } else {
-                type_section(module)
-					.expect("If type section does not exists, the loop will break at the beginning of first iteration")
-					.types_mut().remove(index);
-                eliminated_types.push(old_index);
-                trace!("Eliminated type({})", old_index);
-            }
-            old_index += 1;
+    loop {
+        if type_section(module)
+            .map(|section| section.types_mut().len())
+            .unwrap_or(0)
+            == index
+        {
+            break;
         }
+
+        if stay.contains(&Symbol::Type(old_index)) {
+            index += 1;
+        } else {
+            type_section(module)
+                    .expect("If type section does not exists, the loop will break at the beginning of first iteration")
+                    .types_mut().remove(index);
+            eliminated_types.push(old_index);
+            trace!("Eliminated type({})", old_index);
+        }
+        old_index += 1;
     }
 
     // Second, iterate through imports
@@ -659,10 +658,10 @@ mod tests {
         optimize(&mut module, vec!["_call"]).expect("optimizer to succeed");
 
         assert_eq!(
-			1,
-			module.global_section().expect("global section to be generated").entries().len(),
-			"There should 1 (one) global entry in the optimized module, since _call function uses it"
-		);
+            1,
+            module.global_section().expect("global section to be generated").entries().len(),
+            "There should 1 (one) global entry in the optimized module, since _call function uses it"
+        );
     }
 
     /// @spec 2
@@ -707,10 +706,10 @@ mod tests {
         optimize(&mut module, vec!["_call"]).expect("optimizer to succeed");
 
         assert_eq!(
-			1,
-			module.global_section().expect("global section to be generated").entries().len(),
-			"There should 1 (one) global entry in the optimized module, since _call function uses only one"
-		);
+            1,
+            module.global_section().expect("global section to be generated").entries().len(),
+            "There should 1 (one) global entry in the optimized module, since _call function uses only one"
+        );
     }
 
     /// @spec 3
@@ -849,9 +848,9 @@ mod tests {
             elements::Instruction::CallIndirect(0, 0) => {}
             _ => {
                 panic!(
-					"Expected call_indirect to use index 0 after optimization, since previois 0th was eliminated, but got {:?}",
-					indirect_opcode
-				);
+                    "Expected call_indirect to use index 0 after optimization, since previois 0th was eliminated, but got {:?}",
+                    indirect_opcode
+                );
             }
         }
     }
