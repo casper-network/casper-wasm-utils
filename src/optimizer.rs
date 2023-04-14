@@ -35,11 +35,16 @@ pub fn optimize(
         .entries()
         .iter()
         .enumerate()
-        .filter(|(_, entry)| used_exports.iter().any(|e| *e == entry.field()))
-        .map(|(index, _)| Symbol::Export(index))
+        .filter_map(|(index, entry)| {
+            if used_exports.iter().any(|e| *e == entry.field()) {
+                Some(Symbol::Export(index))
+            } else {
+                None
+            }
+        })
         .collect();
 
-    // If there is start function in module, it should stary
+    // If there is start function in module, it should start
     if let Some(ss) = module.start_section() {
         stay.insert(resolve_function(module, ss));
     }
@@ -108,8 +113,8 @@ pub fn optimize(
             index += 1;
         } else {
             type_section(module)
-					.expect("If type section does not exists, the loop will break at the beginning of first iteration")
-					.types_mut().remove(index);
+                    .expect("If type section does not exists, the loop will break at the beginning of first iteration")
+                    .types_mut().remove(index);
             eliminated_types.push(old_index);
             trace!("Eliminated type({})", old_index);
         }
@@ -653,10 +658,10 @@ mod tests {
         optimize(&mut module, vec!["_call"]).expect("optimizer to succeed");
 
         assert_eq!(
-			1,
-			module.global_section().expect("global section to be generated").entries().len(),
-			"There should 1 (one) global entry in the optimized module, since _call function uses it"
-		);
+            1,
+            module.global_section().expect("global section to be generated").entries().len(),
+            "There should 1 (one) global entry in the optimized module, since _call function uses it"
+        );
     }
 
     /// @spec 2
@@ -701,10 +706,10 @@ mod tests {
         optimize(&mut module, vec!["_call"]).expect("optimizer to succeed");
 
         assert_eq!(
-			1,
-			module.global_section().expect("global section to be generated").entries().len(),
-			"There should 1 (one) global entry in the optimized module, since _call function uses only one"
-		);
+            1,
+            module.global_section().expect("global section to be generated").entries().len(),
+            "There should 1 (one) global entry in the optimized module, since _call function uses only one"
+        );
     }
 
     /// @spec 3
@@ -843,9 +848,9 @@ mod tests {
             elements::Instruction::CallIndirect(0, 0) => {}
             _ => {
                 panic!(
-					"Expected call_indirect to use index 0 after optimization, since previois 0th was eliminated, but got {:?}",
-					indirect_opcode
-				);
+                    "Expected call_indirect to use index 0 after optimization, since previois 0th was eliminated, but got {:?}",
+                    indirect_opcode
+                );
             }
         }
     }
