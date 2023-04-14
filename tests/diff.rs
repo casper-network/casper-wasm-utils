@@ -1,5 +1,6 @@
+use casper_wasm_utils as utils;
 use parity_wasm::elements;
-use pwasm_utils as utils;
+
 use std::{
     fs,
     io::{self, Read, Write},

@@ -1,4 +1,4 @@
-use pwasm_utils::{self as utils, logger};
+use casper_wasm_utils::{self as utils, logger};
 use std::env;
 
 fn main() {
