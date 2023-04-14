@@ -267,18 +267,14 @@ fn instrument_function(ctx: &mut Context, func: &mut Instructions) -> Result<(),
         .iter()
         .enumerate()
         .filter_map(|(offset, instruction)| {
-            if let Call(callee) = instruction {
-                ctx.stack_cost(*callee).and_then(|cost| {
-                    if cost > 0 {
-                        Some(InstrumentCall {
-                            callee: *callee,
-                            offset,
-                            cost,
-                        })
-                    } else {
-                        None
-                    }
-                })
+            if let Call(callee) = *instruction {
+                ctx.stack_cost(callee)
+                    .filter(|&cost| cost > 0)
+                    .map(|cost| InstrumentCall {
+                        callee,
+                        offset,
+                        cost,
+                    })
             } else {
                 None
             }

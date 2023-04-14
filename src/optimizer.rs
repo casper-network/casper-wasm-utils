@@ -29,23 +29,20 @@ pub fn optimize(
     *module = module_temp;
 
     // Algo starts from the top, listing all items that should stay
-    let mut stay = Set::new();
-    for (index, entry) in module
+    let mut stay: Set<_> = module
         .export_section()
         .ok_or(Error::NoExportSection)?
         .entries()
         .iter()
         .enumerate()
-    {
-        if used_exports.iter().any(|e| *e == entry.field()) {
-            stay.insert(Symbol::Export(index));
-        }
-    }
+        .filter(|(_, entry)| used_exports.iter().any(|e| *e == entry.field()))
+        .map(|(index, _)| Symbol::Export(index))
+        .collect();
 
     // If there is start function in module, it should stary
-    module
-        .start_section()
-        .map(|ss| stay.insert(resolve_function(module, ss)));
+    if let Some(ss) = module.start_section() {
+        stay.insert(resolve_function(module, ss));
+    }
 
     // All symbols used in data/element segments are also should be preserved
     let mut init_symbols = Vec::new();
@@ -78,9 +75,8 @@ pub fn optimize(
             }
         }
     }
-    for symbol in init_symbols.drain(..) {
-        stay.insert(symbol);
-    }
+
+    stay.extend(init_symbols.drain(..));
 
     // Call function which will traverse the list recursively, filling stay with all symbols
     // that are already used by those which already there
@@ -99,27 +95,25 @@ pub fn optimize(
     let mut index = 0;
     let mut old_index = 0;
 
-    {
-        loop {
-            if type_section(module)
-                .map(|section| section.types_mut().len())
-                .unwrap_or(0)
-                == index
-            {
-                break;
-            }
+    loop {
+        if type_section(module)
+            .map(|section| section.types_mut().len())
+            .unwrap_or(0)
+            == index
+        {
+            break;
+        }
 
-            if stay.contains(&Symbol::Type(old_index)) {
-                index += 1;
-            } else {
-                type_section(module)
+        if stay.contains(&Symbol::Type(old_index)) {
+            index += 1;
+        } else {
+            type_section(module)
 					.expect("If type section does not exists, the loop will break at the beginning of first iteration")
 					.types_mut().remove(index);
-                eliminated_types.push(old_index);
-                trace!("Eliminated type({})", old_index);
-            }
-            old_index += 1;
+            eliminated_types.push(old_index);
+            trace!("Eliminated type({})", old_index);
         }
+        old_index += 1;
     }
 
     // Second, iterate through imports
