@@ -1,7 +1,4 @@
-#[cfg(not(features = "std"))]
 use crate::std::collections::BTreeMap as Map;
-#[cfg(features = "std")]
-use crate::std::collections::HashMap as Map;
 
 use crate::std::{num::NonZeroU32, str::FromStr};
 use parity_wasm::elements::Instruction;

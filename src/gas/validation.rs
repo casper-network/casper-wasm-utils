@@ -15,10 +15,7 @@ use crate::{
 };
 use parity_wasm::elements::{FuncBody, Instruction};
 
-#[cfg(not(features = "std"))]
 use crate::std::collections::BTreeMap as Map;
-#[cfg(features = "std")]
-use crate::std::collections::HashMap as Map;
 
 /// An ID for a node in a ControlFlowGraph.
 type NodeId = usize;

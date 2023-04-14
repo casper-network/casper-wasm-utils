@@ -1,7 +1,5 @@
 #[cfg(not(features = "std"))]
 use crate::std::collections::BTreeSet as Set;
-#[cfg(features = "std")]
-use crate::std::collections::HashSet as Set;
 use crate::std::{mem, vec::Vec};
 
 use crate::symbols::{expand_symbols, push_code_symbols, resolve_function, Symbol};

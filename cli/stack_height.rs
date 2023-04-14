@@ -1,4 +1,4 @@
-use pwasm_utils::{logger, stack_height};
+use casper_wasm_utils::{logger, stack_height};
 use std::env;
 
 fn main() {
