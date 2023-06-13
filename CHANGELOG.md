@@ -10,6 +10,14 @@ All notable changes to this project will be documented in this file.  The format
 [comment]: <> (Security:   in case of vulnerabilities)
 
 
+## [Unreleased]
+
+## [1.1.0] - 2023-06-13
+
+### Changed
+* Update `parity-wasm` to 0.45.0
+
+
 ## [1.0.0] - 2023-04-17
 
 ### Changed
@@ -25,5 +33,6 @@ All notable changes to this project will be documented in this file.  The format
 
 
 [Keep a Changelog]: https://keepachangelog.com/en/1.0.0
-[unreleased]: https://github.com/casper-network/casper-wasm-utils/compare/c20633c...master
+[unreleased]: https://github.com/casper-network/casper-wasm-utils/compare/v1.1.0...master
+[1.1.0]: https://github.com/casper-network/casper-wasm-utils/compare/c20633c...v1.1.0
 [0.19.0]: https://github.com/paritytech/wasm-utils
