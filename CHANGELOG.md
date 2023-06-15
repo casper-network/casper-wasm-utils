@@ -42,5 +42,5 @@ All notable changes to this project will be documented in this file.  The format
 [Keep a Changelog]: https://keepachangelog.com/en/1.0.0
 [unreleased]: https://github.com/casper-network/casper-wasm-utils/compare/v2.0.0...master
 [1.1.0]: https://github.com/casper-network/casper-wasm-utils/compare/v1.1.0...v2.0.0
-[1.1.0]: https://github.com/casper-network/casper-wasm-utils/compare/c20633c...v1.1.0
+[1.0.0]: https://github.com/casper-network/casper-wasm-utils/compare/c20633c...v1.0.0
 [0.19.0]: https://github.com/paritytech/wasm-utils
