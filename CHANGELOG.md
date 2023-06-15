@@ -14,11 +14,12 @@ All notable changes to this project will be documented in this file.  The format
 
 ## [2.0.0] - 2023-06-14
 
+### Fixed
+* Republish v1.1.0 as v2.0.0 due to breaking change in one of the dependencies.
 
 
-## [1.1.0] - 2023-06-13
 
-
+## [1.1.0] - 2023-06-13 [YANKED]
 
 ### Changed
 * Update `parity-wasm` to 0.45.0
