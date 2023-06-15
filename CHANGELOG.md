@@ -12,7 +12,14 @@ All notable changes to this project will be documented in this file.  The format
 
 ## [Unreleased]
 
-## [1.1.0] - 2023-06-13
+## [2.0.0] - 2023-06-14
+
+### Fixed
+* Republish v1.1.0 as v2.0.0 due to breaking change in one of the dependencies.
+
+
+
+## [1.1.0] - 2023-06-13 [YANKED]
 
 ### Changed
 * Update `parity-wasm` to 0.45.0
@@ -33,6 +40,7 @@ All notable changes to this project will be documented in this file.  The format
 
 
 [Keep a Changelog]: https://keepachangelog.com/en/1.0.0
-[unreleased]: https://github.com/casper-network/casper-wasm-utils/compare/v1.1.0...master
-[1.1.0]: https://github.com/casper-network/casper-wasm-utils/compare/c20633c...v1.1.0
+[unreleased]: https://github.com/casper-network/casper-wasm-utils/compare/v2.0.0...master
+[1.1.0]: https://github.com/casper-network/casper-wasm-utils/compare/v1.1.0...v2.0.0
+[1.0.0]: https://github.com/casper-network/casper-wasm-utils/compare/c20633c...v1.0.0
 [0.19.0]: https://github.com/paritytech/wasm-utils
