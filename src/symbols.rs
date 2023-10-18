@@ -1,8 +1,8 @@
 use crate::std::collections::BTreeSet as Set;
 use crate::std::vec::Vec;
 
+use casper_wasm::elements;
 use log::trace;
-use parity_wasm::elements;
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Copy, Clone, Debug)]
 pub enum Symbol {
@@ -50,7 +50,7 @@ pub fn push_code_symbols(
     instructions: &[elements::Instruction],
     dest: &mut Vec<Symbol>,
 ) {
-    use parity_wasm::elements::Instruction::*;
+    use casper_wasm::elements::Instruction::*;
 
     for instruction in instructions {
         match instruction {

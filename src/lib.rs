@@ -20,7 +20,6 @@ pub use ext::{
 };
 pub use gas::inject_gas_counter;
 pub use optimizer::{optimize, Error as OptimizerError};
-pub use parity_wasm;
 
 pub struct TargetSymbols {
     pub create: &'static str,

@@ -1,11 +1,11 @@
 use crate::std::vec::Vec;
 
 use super::{resolve_func_type, Error};
+use casper_wasm::elements::{self, BlockType, Type};
 use log::trace;
-use parity_wasm::elements::{self, BlockType, Type};
 
 #[cfg(feature = "sign_ext")]
-use parity_wasm::elements::SignExtInstruction;
+use casper_wasm::elements::SignExtInstruction;
 
 /// Control stack frame.
 #[derive(Debug)]
@@ -143,7 +143,7 @@ impl Stack {
 
 /// This function expects the function to be validated.
 pub(crate) fn compute(func_idx: u32, module: &elements::Module) -> Result<u32, Error> {
-    use parity_wasm::elements::Instruction::*;
+    use casper_wasm::elements::Instruction::*;
 
     let func_section = module
         .function_section()
@@ -443,7 +443,7 @@ pub(crate) fn compute(func_idx: u32, module: &elements::Module) -> Result<u32, E
 #[cfg(test)]
 mod tests {
     use super::*;
-    use parity_wasm::elements;
+    use casper_wasm::elements;
 
     fn parse_wat(source: &str) -> elements::Module {
         elements::deserialize_buffer(&wabt::wat2wasm(source).expect("Failed to wat2wasm"))

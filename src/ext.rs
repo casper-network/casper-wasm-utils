@@ -1,7 +1,7 @@
 use crate::std::{borrow::ToOwned, string::String, vec::Vec};
 
 use byteorder::{ByteOrder, LittleEndian};
-use parity_wasm::{builder, elements};
+use casper_wasm::{builder, elements};
 
 use crate::optimizer::{export_section, import_section};
 
@@ -12,7 +12,7 @@ pub fn update_call_index(
     original_imports: usize,
     inserts: &[Insertion],
 ) {
-    use parity_wasm::elements::Instruction::*;
+    use casper_wasm::elements::Instruction::*;
     for instruction in instructions.elements_mut().iter_mut() {
         if let Call(call_index) = instruction {
             if let Some(pos) = inserts.iter().position(|x| x.1 == *call_index) {

@@ -1,10 +1,9 @@
-#[cfg(not(features = "std"))]
 use crate::std::collections::BTreeSet as Set;
 use crate::std::{mem, vec::Vec};
 
 use crate::symbols::{expand_symbols, push_code_symbols, resolve_function, Symbol};
+use casper_wasm::elements;
 use log::trace;
-use parity_wasm::elements;
 
 #[derive(Debug)]
 pub enum Error {
@@ -426,7 +425,7 @@ pub fn optimize(
 }
 
 pub fn update_call_index(instructions: &mut elements::Instructions, eliminated_indices: &[usize]) {
-    use parity_wasm::elements::Instruction::*;
+    use casper_wasm::elements::Instruction::*;
     for instruction in instructions.elements_mut().iter_mut() {
         if let Call(call_index) = instruction {
             let totalle = eliminated_indices
@@ -448,7 +447,7 @@ pub fn update_global_index(
     instructions: &mut [elements::Instruction],
     eliminated_indices: &[usize],
 ) {
-    use parity_wasm::elements::Instruction::*;
+    use casper_wasm::elements::Instruction::*;
     for instruction in instructions.iter_mut() {
         match instruction {
             GetGlobal(index) | SetGlobal(index) => {
@@ -470,7 +469,7 @@ pub fn update_global_index(
 
 /// Updates global references considering the _ordered_ list of eliminated indices
 pub fn update_type_index(instructions: &mut elements::Instructions, eliminated_indices: &[usize]) {
-    use parity_wasm::elements::Instruction::*;
+    use casper_wasm::elements::Instruction::*;
     for instruction in instructions.elements_mut().iter_mut() {
         if let CallIndirect(call_index, _) = instruction {
             let totalle = eliminated_indices
@@ -545,7 +544,7 @@ pub fn type_section(module: &mut elements::Module) -> Option<&mut elements::Type
 mod tests {
 
     use super::*;
-    use parity_wasm::{builder, elements};
+    use casper_wasm::{builder, elements};
 
     /// @spec 0
     /// Optimizer presumes that export section exists and contains
