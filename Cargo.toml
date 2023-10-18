@@ -24,7 +24,7 @@ required-features = ["cli"]
 [dependencies]
 byteorder = { version = "1", default-features = false }
 log = { version = "0.4", default-features = false }
-parity-wasm = { version = "0.45", default-features = false }
+casper-wasm = { version = "0.46", default-features = false }
 
 # Dependencies only used by the binaries
 clap = { version = "2", optional = true }
@@ -42,7 +42,7 @@ wabt = "0.10"
 
 [features]
 default = ["std"]
-std = ["parity-wasm/std", "log/std", "byteorder/std"]
+std = ["casper-wasm/std", "log/std", "byteorder/std"]
 cli = [
   "std",
   "glob",
@@ -50,4 +50,4 @@ cli = [
   "env_logger",
   "lazy_static",
 ]
-sign_ext = ["parity-wasm/sign_ext"]
+sign_ext = ["casper-wasm/sign_ext"]

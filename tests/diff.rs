@@ -1,5 +1,5 @@
+use casper_wasm::elements;
 use casper_wasm_utils as utils;
-use parity_wasm::elements;
 
 use std::{
     fs,

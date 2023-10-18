@@ -1,7 +1,7 @@
 use crate::std::collections::BTreeMap as Map;
 
 use crate::std::{num::NonZeroU32, str::FromStr};
-use parity_wasm::elements::Instruction;
+use casper_wasm::elements::Instruction;
 
 pub struct UnknownInstruction;
 

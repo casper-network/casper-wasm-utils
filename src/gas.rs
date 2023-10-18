@@ -10,10 +10,10 @@ mod validation;
 use crate::std::{cmp::min, mem, vec::Vec};
 
 use crate::rules::Rules;
-use parity_wasm::{builder, elements, elements::ValueType};
+use casper_wasm::{builder, elements, elements::ValueType};
 
 pub fn update_call_index(instructions: &mut elements::Instructions, inserted_index: u32) {
-    use parity_wasm::elements::Instruction::*;
+    use casper_wasm::elements::Instruction::*;
     for instruction in instructions.elements_mut().iter_mut() {
         if let Call(call_index) = instruction {
             if *call_index >= inserted_index {
@@ -225,7 +225,7 @@ impl Counter {
 }
 
 fn inject_grow_counter(instructions: &mut elements::Instructions, grow_counter_func: u32) -> usize {
-    use parity_wasm::elements::Instruction::*;
+    use casper_wasm::elements::Instruction::*;
     let mut counter = 0;
     for instruction in instructions.elements_mut() {
         if let GrowMemory(_) = *instruction {
@@ -242,7 +242,7 @@ fn add_grow_counter<R: Rules>(
     gas_func: u32,
 ) -> elements::Module {
     use crate::rules::MemoryGrowCost;
-    use parity_wasm::elements::Instruction::*;
+    use casper_wasm::elements::Instruction::*;
 
     let cost = match rules.memory_grow_cost() {
         None => return module,
@@ -278,7 +278,7 @@ pub(crate) fn determine_metered_blocks<R: Rules>(
     instructions: &elements::Instructions,
     rules: &R,
 ) -> Result<Vec<MeteredBlock>, ()> {
-    use parity_wasm::elements::Instruction::*;
+    use casper_wasm::elements::Instruction::*;
 
     let mut counter = Counter::new();
 
@@ -365,7 +365,7 @@ fn insert_metering_calls(
     blocks: Vec<MeteredBlock>,
     gas_func: u32,
 ) -> Result<(), ()> {
-    use parity_wasm::elements::Instruction::*;
+    use casper_wasm::elements::Instruction::*;
 
     // To do this in linear time, construct a new vector of instructions, copying over old
     // instructions one by one and injecting new ones as required.
@@ -532,7 +532,7 @@ pub fn inject_gas_counter<R: Rules>(
 mod tests {
     use super::*;
     use crate::rules;
-    use parity_wasm::{builder, elements, elements::Instruction::*, serialize};
+    use casper_wasm::{builder, elements, elements::Instruction::*, serialize};
 
     pub fn get_function_body(
         module: &elements::Module,

@@ -51,7 +51,7 @@
 
 use crate::std::{mem, string::String, vec::Vec};
 
-use parity_wasm::{
+use casper_wasm::{
     builder,
     elements::{self, Instruction, Instructions, Type},
 };
@@ -59,7 +59,7 @@ use parity_wasm::{
 /// Macro to generate preamble and postamble.
 macro_rules! instrument_call {
     ($callee_idx: expr, $callee_stack_cost: expr, $stack_height_global_idx: expr, $stack_limit: expr) => {{
-        use $crate::parity_wasm::elements::Instruction::*;
+        use $crate::casper_wasm::elements::Instruction::*;
         [
             // stack_height += stack_cost(F)
             GetGlobal($stack_height_global_idx),
@@ -365,7 +365,7 @@ fn resolve_func_type(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use parity_wasm::elements;
+    use casper_wasm::elements;
 
     fn parse_wat(source: &str) -> elements::Module {
         elements::deserialize_buffer(&wabt::wat2wasm(source).expect("Failed to wat2wasm"))

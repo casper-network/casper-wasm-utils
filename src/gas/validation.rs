@@ -13,7 +13,7 @@ use crate::{
     rules::{Rules, Set as RuleSet},
     std::vec::Vec,
 };
-use parity_wasm::elements::{FuncBody, Instruction};
+use casper_wasm::elements::{FuncBody, Instruction};
 
 use crate::std::collections::BTreeMap as Map;
 
@@ -343,7 +343,7 @@ mod tests {
     use super::{super::determine_metered_blocks, *};
 
     use binaryen::tools::translate_to_fuzz_mvp;
-    use parity_wasm::elements;
+    use casper_wasm::elements;
     use rand::{thread_rng, RngCore};
 
     #[test]

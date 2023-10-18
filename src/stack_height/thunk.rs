@@ -1,7 +1,7 @@
 use crate::std::collections::{BTreeMap as Map, BTreeSet as Set};
 use crate::std::vec::Vec;
 
-use parity_wasm::{
+use casper_wasm::{
     builder,
     elements::{self, FunctionType, Internal},
 };
