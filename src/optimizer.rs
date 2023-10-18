@@ -1,4 +1,3 @@
-#[cfg(not(features = "std"))]
 use crate::std::collections::BTreeSet as Set;
 use crate::std::{mem, vec::Vec};
 
