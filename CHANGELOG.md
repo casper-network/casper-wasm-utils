@@ -12,6 +12,10 @@ All notable changes to this project will be documented in this file.  The format
 
 ## [Unreleased]
 
+### Changed
+* Move from `parity-wasm` to `casper-wasm`.
+* Don't re-export `parity-wasm` anymore to avoid further breaking changes.
+
 ## [2.0.0] - 2023-06-14
 
 ### Fixed
