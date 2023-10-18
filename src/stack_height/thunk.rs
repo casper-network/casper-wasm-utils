@@ -6,7 +6,7 @@ use casper_wasm::{
     elements::{self, FunctionType, Internal},
 };
 
-use super::{resolve_func_type, Context, Error};
+use super::{instrument_call, resolve_func_type, Context, Error};
 
 struct Thunk {
     signature: FunctionType,
@@ -77,11 +77,11 @@ pub(crate) fn generate_thunks(
 
     let mut mbuilder = builder::from_module(module);
     for (func_idx, thunk) in replacement_map.iter_mut() {
-        let instrumented_call = instrument_call!(
+        let instrumented_call = instrument_call(
             *func_idx,
-            thunk.callee_stack_cost as i32,
+            thunk.callee_stack_cost,
             ctx.stack_height_global_idx(),
-            ctx.stack_limit()
+            ctx.stack_limit(),
         );
         // Thunk body consist of:
         //  - argument pushing

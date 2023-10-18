@@ -56,33 +56,38 @@ use casper_wasm::{
     elements::{self, Instruction, Instructions, Type},
 };
 
-/// Macro to generate preamble and postamble.
-macro_rules! instrument_call {
-    ($callee_idx: expr, $callee_stack_cost: expr, $stack_height_global_idx: expr, $stack_limit: expr) => {{
-        use $crate::casper_wasm::elements::Instruction::*;
-        [
-            // stack_height += stack_cost(F)
-            GetGlobal($stack_height_global_idx),
-            I32Const($callee_stack_cost),
-            I32Add,
-            SetGlobal($stack_height_global_idx),
-            // if stack_counter > LIMIT: unreachable
-            GetGlobal($stack_height_global_idx),
-            I32Const($stack_limit as i32),
-            I32GtU,
-            If(elements::BlockType::NoResult),
-            Unreachable,
-            End,
-            // Original call
-            Call($callee_idx),
-            // stack_height -= stack_cost(F)
-            GetGlobal($stack_height_global_idx),
-            I32Const($callee_stack_cost),
-            I32Sub,
-            SetGlobal($stack_height_global_idx),
-        ]
-    }};
+/// Const function to generate preamble and postamble.
+const fn instrument_call(
+    callee_idx: u32,
+    callee_stack_cost: u32,
+    stack_height_global_idx: u32,
+    stack_limit: u32,
+) -> [Instruction; INSTRUMENT_CALL_LENGTH] {
+    use casper_wasm::elements::Instruction::*;
+    [
+        // stack_height += stack_cost(F)
+        GetGlobal(stack_height_global_idx),
+        I32Const(callee_stack_cost as i32),
+        I32Add,
+        SetGlobal(stack_height_global_idx),
+        // if stack_counter > LIMIT: unreachable
+        GetGlobal(stack_height_global_idx),
+        I32Const(stack_limit as i32),
+        I32GtU,
+        If(elements::BlockType::NoResult),
+        Unreachable,
+        End,
+        // Original call
+        Call(callee_idx),
+        // stack_height -= stack_cost(F)
+        GetGlobal(stack_height_global_idx),
+        I32Const(callee_stack_cost as i32),
+        I32Sub,
+        SetGlobal(stack_height_global_idx),
+    ]
 }
+
+const INSTRUMENT_CALL_LENGTH: usize = 15;
 
 mod max_height;
 mod thunk;
@@ -282,7 +287,7 @@ fn instrument_function(ctx: &mut Context, func: &mut Instructions) -> Result<(),
         .collect();
 
     // The `instrumented_call!` contains the call itself. This is why we need to subtract one.
-    let len = func.elements().len() + calls.len() * (instrument_call!(0, 0, 0, 0).len() - 1);
+    let len = func.elements().len() + calls.len() * (INSTRUMENT_CALL_LENGTH - 1);
     let original_instrs = mem::replace(func.elements_mut(), Vec::with_capacity(len));
     let new_instrs = func.elements_mut();
 
@@ -291,11 +296,11 @@ fn instrument_function(ctx: &mut Context, func: &mut Instructions) -> Result<(),
         // whether there is some call instruction at this position that needs to be instrumented
         let did_instrument = if let Some(call) = calls.peek() {
             if call.offset == original_pos {
-                let new_seq = instrument_call!(
+                let new_seq = instrument_call(
                     call.callee,
-                    call.cost as i32,
+                    call.cost,
                     ctx.stack_height_global_idx(),
-                    ctx.stack_limit()
+                    ctx.stack_limit(),
                 );
                 new_instrs.extend(new_seq);
                 true

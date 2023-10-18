@@ -15,7 +15,6 @@ mod symbols;
 
 pub mod stack_height;
 
-pub use casper_wasm;
 pub use ext::{
     externalize, externalize_mem, shrink_unknown_stack, underscore_funcs, ununderscore_funcs,
 };
