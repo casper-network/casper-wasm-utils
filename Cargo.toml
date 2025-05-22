@@ -51,3 +51,4 @@ cli = [
   "lazy_static",
 ]
 sign_ext = ["casper-wasm/sign_ext"]
+call_indirect_overlong = ["casper-wasm/call_indirect_overlong"]
