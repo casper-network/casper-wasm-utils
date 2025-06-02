@@ -24,7 +24,7 @@ required-features = ["cli"]
 [dependencies]
 byteorder = { version = "1", default-features = false }
 log = { version = "0.4", default-features = false }
-casper-wasm = { git = "https://github.com/igor-casper/casper-wasm.git", branch = "core-78", default-features = false }
+casper-wasm = { version = "0.47", default-features = false }
 
 # Dependencies only used by the binaries
 clap = { version = "2", optional = true }
