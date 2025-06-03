@@ -1,6 +1,6 @@
 [package]
 name = "casper-wasm-utils"
-version = "3.1.0"
+version = "4.0.0"
 edition = "2021"
 rust-version = "1.56.1"
 authors = ["Nikolay Volf <nikvolf@gmail.com>", "Sergey Pepyakin <s.pepyakin@gmail.com>", "Félix Daudré-Vignier <felix@casperlabs.io>", "Michał Papierski <michal@casperlabs.io>"]
@@ -24,7 +24,7 @@ required-features = ["cli"]
 [dependencies]
 byteorder = { version = "1", default-features = false }
 log = { version = "0.4", default-features = false }
-casper-wasm = { version = "0.47", default-features = false }
+casper-wasm = { version = "1.0.0", default-features = false }
 
 # Dependencies only used by the binaries
 clap = { version = "2", optional = true }
